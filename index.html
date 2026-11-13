@@ -2,41 +2,78 @@
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-html,body{margin:0;height:100%;background:#111;color:#ddd;font:14px monospace;overflow:hidden}
+:root{--card:#15151b;--line:#2a2a34;--acc:#e23a2e;--gold:#ffcf4a;--tx:#ececf2;--mut:#8b8b98}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:var(--tx);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
 #cv{width:100vw;height:100vh;display:block;object-fit:contain;image-rendering:pixelated;background:#000}
-#m{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000d;overflow:auto}
-#m>div{width:min(580px,92vw);background:#222;border:2px solid #a22;padding:16px}
-textarea{width:100%;height:64px;background:#111;color:#8f8;border:1px solid #555;box-sizing:border-box;font-size:11px}
-button{background:#a22;color:#fff;border:0;padding:8px 12px;margin:3px;font:inherit;cursor:pointer}
-h1{margin:0 0 8px;color:#e33}p{margin:8px 0 4px}
+#m{position:fixed;inset:0;display:flex;background:radial-gradient(ellipse at 50% 20%,#34100d 0,#0b0b0e 70%);overflow:auto;padding:14px}
+#m>div{width:min(540px,100%);margin:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;box-shadow:0 24px 70px #000b}
+h1{margin:0;font:800 30px/1 system-ui,sans-serif;letter-spacing:7px;color:var(--acc);text-align:center;text-shadow:0 0 24px #e23a2e55}
+.sub{text-align:center;color:var(--mut);font-size:12px;margin:8px 0 16px}
+h2{margin:16px 0 7px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--mut);font-weight:600}
+p{margin:6px 0}.hint{color:var(--mut);font-size:12px}
+input,select,textarea{width:100%;background:#0e0e13;color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+input[type=range]{padding:0;accent-color:var(--acc)}input[type=file]{font-size:12px;color:var(--mut)}
+textarea{height:64px;font:11px monospace;color:#8f8;resize:none}
+button{background:#23232c;color:var(--tx);border:1px solid var(--line);border-radius:9px;padding:10px 14px;font:600 13px system-ui,sans-serif;cursor:pointer;transition:.12s}
+button:hover{background:#2e2e39;border-color:#44444f}
+button.pri{background:var(--acc);border-color:var(--acc);color:#fff}button.pri:hover{background:#f04b3f}
+button.big{padding:14px;font-size:15px;flex:1}
+.row{display:flex;gap:10px;margin-top:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid3 label{font-size:11px;color:var(--mut)}.grid3 select{margin-top:3px;padding:8px 6px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.tab{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;color:var(--mut);padding:9px 14px}
+.tab:hover{background:none;color:var(--tx)}.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+#lg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#lg label{display:block;padding:9px 11px;background:#0e0e13;border:1px solid var(--line);border-radius:9px;cursor:pointer;transition:.12s;user-select:none}
+#lg label:hover{border-color:#44444f}#lg label.on{border-color:var(--gold);background:#2a2411}
+#lg input{display:none}#lg b{display:block;font-size:12px;letter-spacing:.5px}#lg i{display:block;font-style:normal;font-size:11px;color:var(--mut);margin-top:1px}
+.code{font:800 40px/1 monospace;letter-spacing:10px;color:var(--gold);text-align:center;background:#0e0e13;border:1px dashed #4a4a55;border-radius:10px;padding:14px 0;margin:6px 0}
+details{margin-top:12px;color:var(--mut);font-size:12px}summary{cursor:pointer;padding:4px 0}summary:hover{color:var(--tx)}details>p,details>div{margin-top:6px}
+#pl{font-size:12px;color:var(--mut);text-align:center}#ls{text-align:center;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+kbd{background:#23232c;border:1px solid var(--line);border-radius:4px;padding:0 5px;font:11px monospace;color:var(--tx)}
 </style></head><body>
 <canvas id="cv"></canvas>
 <div id="m"><div>
-<h1>HELLFIRE LAN</h1>
-<p>🎵 Musik (läuft leise im Loop): <input type="file" id="mf" accept="audio/*" style="max-width:55%"><br>Lautstärke: <input type="range" id="mv" min="0" max="100" value="15" style="width:40%"> <span style="color:#888">(oder Datei <b>music.mp3</b> neben die index.html legen)</span></p>
+<h1>HELLFIRE LAN</h1><div class="sub">Koop-Shooter gegen Wellen &middot; 1&ndash;4 Spieler</div>
+<div class="tabs"><button class="tab on" id="tb0" onclick="tab(0)">Spiel</button><button class="tab" id="tb1" onclick="tab(1)">Waffen <span id="lc"></span></button><button class="tab" id="tb2" onclick="tab(2)">Musik</button></div>
+
+<div id="t0">
 <div id="m0">
-<p>Name: <input id="nm" maxlength="10" value="Spieler" style="font:16px monospace;width:9em"></p>
-<button onclick="hostMode()">Host / Solo</button><button onclick="joinMode()">Beitreten</button>
-<p>Koop gegen Dämonen-Wellen, 1-4 Spieler.<br>WASD bewegen, Maus zielen, Klick schießen, 1-6 oder Mausrad Waffe wechseln, Pfeiltasten drehen.</p>
-<p>Verbindung: Host erzeugt einen Code, Mitspieler fügt ihn ein und schickt den Antwort-Code zurück (z.B. per Chat). Alle müssen im selben WLAN sein.</p>
+<h2>Spielername</h2><input id="nm" maxlength="10" value="Spieler">
+<div class="row"><button class="pri big" onclick="hostMode()">&#9654; Host / Solo</button><button class="big" onclick="joinMode()">&#8674; Beitreten</button></div>
+<details><summary>Steuerung &amp; Hilfe</summary><p><kbd>WASD</kbd> bewegen &middot; Maus zielen &middot; Klick schie&szlig;en &middot; <kbd>Shift</kbd> rennen<br><kbd>1</kbd>&ndash;<kbd>9</kbd> oder Mausrad: Waffe wechseln &middot; <kbd>M</kbd> Minimap &middot; <kbd>N</kbd> Ton aus &middot; <kbd>P</kbd> Pause</p>
+<p>Online: Host erzeugt einen 4-stelligen Raum-Code, Mitspieler geben ihn unter &bdquo;Beitreten&ldquo; ein.</p></details>
 </div>
 <div id="mh" style="display:none">
-<p>Dein Raum-Code (Mitspieler geben ihn unter „Beitreten“ ein):</p><div id="hc" style="font-size:38px;color:#fd4;letter-spacing:8px">...</div>
-<p>Karte: <select id="mp"><option value="0">Arena</option><option value="1">Ringlabyrinth</option><option value="2">Pfeilerhalle (Hölle)</option><option value="3">Bunker</option><option value="4">Kathedrale</option><option value="5">Schlangenweg</option></select><br>Schwierigkeit: <select id="df"><option value="0">Leicht</option><option value="1" selected>Normal</option><option value="2">Hart</option></select><br>Modus: <select id="gm"><option value="0">Koop gegen Dämonen</option><option value="1">Deathmatch (ab 2 Spieler)</option></select> &nbsp; (M = Minimap, N = Ton aus, P = Pause, Shift = Rennen, 1-7 Waffen)</p>
-<details><summary>Ohne Internet: manuelle Codes</summary><button onclick="invite()">+ Mitspieler einladen</button>
+<h2>Raum-Code &ndash; an Mitspieler schicken</h2><div class="code" id="hc">...</div>
+<div class="grid3" style="margin-top:12px">
+<label>Karte<select id="mp"><option value="0">Arena</option><option value="1">Ringlabyrinth</option><option value="2">Pfeilerhalle (H&ouml;lle)</option><option value="3">Bunker</option><option value="4">Kathedrale</option><option value="5">Schlangenweg</option></select></label>
+<label>Schwierigkeit<select id="df"><option value="0">Leicht</option><option value="1" selected>Normal</option><option value="2">Hart</option></select></label>
+<label>Modus<select id="gm"><option value="0">Koop</option><option value="1">Deathmatch (2+)</option></select></label></div>
+<p id="pl" style="margin-top:12px"></p>
+<div class="row"><button class="pri big" onclick="startGame()">SPIEL STARTEN</button></div>
+<details><summary>Ohne Internet: manuelle Codes</summary><div><button onclick="invite()">+ Mitspieler einladen</button>
 <p>1) Diesen Code an den Mitspieler schicken:</p><textarea id="oc" readonly></textarea>
-<p>2) Antwort-Code des Mitspielers hier einfügen:</p><textarea id="ia"></textarea>
-<button onclick="accept()">Verbinden</button></details>
-<p id="pl"></p>
-<button onclick="startGame()">SPIEL STARTEN</button>
+<p>2) Antwort-Code des Mitspielers hier einf&uuml;gen:</p><textarea id="ia"></textarea>
+<button onclick="accept()" style="margin-top:6px">Verbinden</button></div></details>
 </div>
 <div id="mj" style="display:none">
-<p>Raum-Code vom Host eingeben:</p><input id="jc" maxlength="12" style="font:28px monospace;width:5em;text-transform:uppercase"> <button onclick="joinCode()">Verbinden</button><p id="js2"></p>
-<details><summary>Ohne Internet: manuelle Codes</summary><p>1) Code vom Host einfügen:</p><textarea id="ic"></textarea>
-<button onclick="join()">Antwort-Code erzeugen</button>
+<h2>Raum-Code vom Host</h2><div class="row" style="margin-top:0"><input id="jc" maxlength="12" placeholder="ABCD" style="font:800 24px monospace;letter-spacing:6px;text-transform:uppercase;text-align:center"><button class="pri" onclick="joinCode()">Verbinden</button></div><p id="js2" class="hint"></p>
+<details><summary>Ohne Internet: manuelle Codes</summary><div><p>1) Code vom Host einf&uuml;gen:</p><textarea id="ic"></textarea>
+<button onclick="join()" style="margin-top:6px">Antwort-Code erzeugen</button>
 <p>2) Diesen Antwort-Code an den Host schicken:</p><textarea id="oc2" readonly></textarea>
-<p id="js">Danach warten, das Spiel startet automatisch.</p></details>
+<p id="js">Danach warten, das Spiel startet automatisch.</p></div></details>
 </div>
+<p id="ls" class="hint"></p>
+</div>
+
+<div id="t1" style="display:none"><p class="hint" style="margin-top:0">W&auml;hle bis zu 5 Waffen. Die Faust ist immer dabei. Munition gibt es nur f&uuml;r gew&auml;hlte Waffen.</p><div id="lg"></div></div>
+
+<div id="t2" style="display:none"><h2 style="margin-top:0">Hintergrundmusik</h2><input type="file" id="mf" accept="audio/*">
+<h2>Lautst&auml;rke</h2><input type="range" id="mv" min="0" max="100" value="15">
+<p class="hint">Der Song l&auml;uft leise im Loop. Alternativ eine Datei <b>music.mp3</b> neben die index.html legen &ndash; dann startet sie automatisch.</p></div>
 </div></div>
 <script>
 const BG=new Audio();BG.loop=true;BG.volume=.15;BG.src='music.mp3';
@@ -96,32 +133,43 @@ const WP=[
  {nm:'MASCHINENGEWEHR',cd:.09,d:9,n:1,sp:.05,rg:40,am:1},
  {nm:'RAKETENWERFER',cd:.9,pr:3,v:10,am:1},
  {nm:'PLASMA',cd:.12,pr:4,v:15,am:1},
- {nm:'BFG',cd:1.6,pr:12,v:8,am:1}];
-const MX=[0,0,50,200,25,200,10],AM0=()=>[0,0,8,40,3,50,0];
+ {nm:'BFG',cd:1.6,pr:12,v:8,am:1},
+ {nm:'SNIPER',cd:1.1,d:90,n:1,sp:0,rg:60,am:1},
+ {nm:'REVOLVER',cd:.5,d:38,n:1,sp:.01,rg:40,am:1},
+ {nm:'FLAMMENWERFER',cd:.05,d:3.5,n:3,sp:.3,rg:4.5,am:1},
+ {nm:'GRANATENWERFER',cd:.8,pr:18,v:9,am:1,l:1.1},
+ {nm:'BLITZPISTOLE',cd:.45,d:22,n:1,sp:0,rg:12,am:1,ch:1},
+ {nm:'RAILGUN',cd:1.4,d:70,n:1,sp:0,rg:60,am:1,pi:1}];
+const SN=['FAUST','PISTOLE','SHOTGUN','MG','RAKETE','PLASMA','BFG','SNIPER','REVOLVER','FLAMME','GRANATE','BLITZ','RAIL'],
+ DS=['','unendlich Munition','8 Schrot, nah stark','schnelles Dauerfeuer','Flächenschaden','schneller Strahl','riesige Explosion','1 Schuss, 90 Schaden','langsam, hart','kurze Reichweite','explodiert nach Flug','springt auf Gegner über','durchschlägt alle'];
+const owned=lo=>WP.map((_,i)=>i).filter(i=>lo>>i&1),firstW=lo=>{const L=owned(lo);return L.length>1?L[1]:0};
+const MX=[0,0,50,200,25,200,10,20,60,300,20,80,12],AM0=()=>[0,0,8,40,3,50,0,5,24,100,5,30,3];
 // ---------- Zustand (Host simuliert) ----------
-const players=[0,1,2,3].map(i=>({i,on:i==0,x:SP[i][0],y:SP[i][1],a:A0[i],al:true,hp:100,w:1,f:0,cd:0,rt:0,sc:0,rc:0,ar:0,am:AM0()}));
+const players=[0,1,2,3].map(i=>({i,on:i==0,x:SP[i][0],y:SP[i][1],a:A0[i],al:true,hp:100,w:1,lo:63,f:0,cd:0,rt:0,sc:0,rc:0,ar:0,am:AM0()}));
 let E=[],J=[],PK=[],NJ=[],wave=0,toSpawn=0,spawnT=0,waitT=3,S=null,mode=0,id=0,me=players[0];
 let dm=0,pkT=3,best=+(()=>{try{return localStorage.hfBest}catch(e){}})()||0,EV=[],bn=0,lastWv=-1,dif=1,dmg=1,hostCode='',bob=0,showMap=1,dt=.016,lc=0,fl=0,rec=0,hurtFl=0,lastHp=100,lost=0,snapT=0;
 const chs=[];let pend=null,ch=null;
 function hurtP(p,d){if(!p.al)return;d*=dmg;if(p.ar>0){const a=Math.min(p.ar,d*.5);p.ar-=a;d-=a}p.hp-=d;if(p.hp<=0){p.hp=0;p.al=false;p.rt=dm?3:5}}
-function resp(p){p.al=true;p.hp=100;p.x=SP[p.i][0];p.y=SP[p.i][1];p.a=A0[p.i];p.rc++;p.w=1;p.am=AM0();p.ar=0}
+function resp(p){p.al=true;p.hp=100;p.x=SP[p.i][0];p.y=SP[p.i][1];p.a=A0[p.i];p.rc++;p.w=firstW(p.lo);p.am=AM0();p.ar=0}
 function hurtE(e,d,o){if(e.dead)return;e.hp-=d;e.fl=.1;if(e.hp>0)ev(0);if(e.hp<=0){e.dead=1;ev(1);if(players[o])players[o].sc+=e.t==10?100:e.t==1?15:10;const q=Math.random();if(e.t==10)PK.push({x:e.x-.4,y:e.y,t:6},{x:e.x+.4,y:e.y,t:7},{x:e.x,y:e.y+.4,t:11});else if(q<.45)PK.push({x:e.x,y:e.y,t:q<.2?6:q<.35?7:11})}}
 function shoot(p,a,w){
- const rx=Math.cos(a),ry=Math.sin(a);let bd=Math.min(cast(p.x,p.y,rx,ry).d,w.rg),best=null;
+ const rx=Math.cos(a),ry=Math.sin(a);let bd=Math.min(cast(p.x,p.y,rx,ry).d,w.rg),best=null;const wd=bd;
  for(const e of E){if(e.dead)continue;const vx=e.x-p.x,vy=e.y-p.y,al=vx*rx+vy*ry;
   if(al<0||al>bd)continue;if(Math.abs(vx*ry-vy*rx)<e.r){best=e;bd=al}}
- if(best)hurtE(best,w.d,p.i);
+ if(w.pi){for(const e of E){if(e.dead)continue;const vx=e.x-p.x,vy=e.y-p.y,al=vx*rx+vy*ry;if(al>0&&al<wd&&Math.abs(vx*ry-vy*rx)<e.r)hurtE(e,w.d,p.i)}}
+ else if(best){const bx=best.x,by=best.y;hurtE(best,w.d,p.i);if(w.ch){let c=0;for(const o of E){if(o===best||o.dead||c>=2)continue;if(Math.hypot(o.x-bx,o.y-by)<3.5){hurtE(o,w.d*.6,p.i);c++}}}}
  if(dm){let bp=null;for(const q of players){if(q===p||!q.on||!q.al)continue;const vx=q.x-p.x,vy=q.y-p.y,al=vx*rx+vy*ry;if(al<0||al>bd)continue;if(Math.abs(vx*ry-vy*rx)<.3){bp=q;bd=al}}if(bp)hitP(bp,w.d,p.i)}
 }
 function fire(p){
  const w=WP[p.w];if(!w)return;
+ if(!(p.lo>>p.w&1)){p.cd=.2;return}
  if(w.am&&p.am[p.w]<=0){p.cd=.3;return}
  if(w.am)p.am[p.w]--;p.cd=w.cd;
- if(w.pr){J.push({x:p.x+Math.cos(p.a)*.4,y:p.y+Math.sin(p.a)*.4,vx:Math.cos(p.a)*w.v,vy:Math.sin(p.a)*w.v,t:w.pr,o:p.i,l:3});return}
+ if(w.pr){J.push({x:p.x+Math.cos(p.a)*.4,y:p.y+Math.sin(p.a)*.4,vx:Math.cos(p.a)*w.v,vy:Math.sin(p.a)*w.v,t:w.pr,o:p.i,l:w.l||3});return}
  for(let k=0;k<w.n;k++)shoot(p,p.a+(Math.random()-.5)*w.sp*2,w);
 }
 function boom(j){
- const R=j.t==12?6:2.5,D=j.t==12?400:110;
+ const R=j.t==12?6:j.t==18?3.2:2.5,D=j.t==12?400:j.t==18?95:110;
  for(const e of E){const d=Math.hypot(e.x-j.x,e.y-j.y);if(d<R)hurtE(e,D*(1-d/R),j.o)}
  if(dm)for(const q of players){if(!q.on||!q.al)continue;const d=Math.hypot(q.x-j.x,q.y-j.y);if(d<R)hitP(q,D*(1-d/R)*(q.i==j.o?.5:1),j.o)}
  ev(2);NJ.push({x:j.x,y:j.y,vx:0,vy:0,t:5,o:j.o,l:.35});
@@ -139,7 +187,7 @@ function sim(dt){
   if(p.f&&p.cd<=0)fire(p);
   PK=PK.filter(k=>{if(Math.hypot(k.x-p.x,k.y-p.y)>.6)return true;
    if(k.t==7){if(p.hp>=100)return true;p.hp=Math.min(100,p.hp+25)}else if(k.t==11){if(p.ar>=100)return true;p.ar=Math.min(100,p.ar+35)}
-   else{[2,3,4,5,6].forEach((w,i)=>p.am[w]=Math.min(MX[w],p.am[w]+[6,30,2,30,Math.random()<.3?1:0][i]))}ev(3);
+   else{const G=[0,0,6,30,2,30,Math.random()<.3?1:0,3,12,60,2,12,Math.random()<.4?1:0];for(let w=2;w<WP.length;w++)if(p.lo>>w&1)p.am[w]=Math.min(MX[w],p.am[w]+G[w])}ev(3);
    return false});
  }
  const np=players.filter(p=>p.on).length;
@@ -181,7 +229,7 @@ function sim(dt){
   if(j.t==2){for(const p of players)if(p.on&&p.al&&Math.hypot(p.x-j.x,p.y-j.y)<.4){hurtP(p,12);hit=1}}
   else for(const e of E)if(!e.dead&&Math.hypot(e.x-j.x,e.y-j.y)<e.r+.1){if(j.t==4)hurtE(e,16,j.o);hit=1;break}
   if(dm&&j.t!=2)for(const q of players)if(q.on&&q.al&&q.i!==j.o&&Math.hypot(q.x-j.x,q.y-j.y)<.4){if(j.t==4)hitP(q,16,j.o);hit=1}
-  if(hit){if(j.t==3||j.t==12)boom(j);return false}
+  if(hit){if(j.t==3||j.t==12||j.t==18)boom(j);return false}
   return true});
  J.push(...NJ);NJ=[];E=E.filter(e=>!e.dead||(e.dd||0)<.6);
 }
@@ -205,12 +253,22 @@ function gun(w){switch(w){
  case 3:nz(.05,'highpass',2200,2200,.3);nz(.08,'bandpass',1300,500,.22);tone(170,70,.06,'square',.14);break;
  case 4:nz(.7,'bandpass',300,2400,.4);tone(85,30,.45,'sawtooth',.4);nz(.1,'lowpass',2500,300,.5);break;
  case 5:tone(1700,170,.14,'square',.11);tone(950,120,.22,'sine',.22);nz(.05,'highpass',5000,5000,.08);break;
- case 6:tone(50,420,.55,'sawtooth',.3);tone(320,40,.9,'square',.14,.15);nz(.9,'lowpass',3200,100,.5,.1);break}}
+ case 6:tone(50,420,.55,'sawtooth',.3);tone(320,40,.9,'square',.14,.15);nz(.9,'lowpass',3200,100,.5,.1);break
+ case 7:nz(.08,'highpass',3000,3000,.4);nz(.5,'lowpass',3500,150,.6);tone(140,30,.5,'sine',.7);tone(900,200,.25,'sawtooth',.1);break
+ case 8:nz(.06,'highpass',2400,2400,.35);nz(.2,'lowpass',2500,200,.5);tone(130,40,.25,'sine',.6);break
+ case 9:nz(.12,'bandpass',900,600,.18,0,.7);nz(.1,'lowpass',2500,500,.15);break
+ case 10:tone(150,50,.2,'sine',.5);nz(.15,'lowpass',1800,200,.4);tone(500,250,.12,'square',.1);break
+ case 11:tone(1200,200,.12,'sawtooth',.14);nz(.12,'highpass',4000,4000,.15);tone(60,60,.1,'square',.1);break
+ case 12:tone(2000,100,.35,'sine',.3);tone(60,300,.2,'sawtooth',.2);nz(.35,'bandpass',3000,300,.3);break}}
 function click(){tone(900,650,.03,'square',.08)}
 function hurtSnd(){tone(150,45,.22,'sawtooth',.4);nz(.14,'lowpass',1300,200,.4)}
 function jingle(b){if(b){tone(110,95,.6,'sawtooth',.3);tone(104,88,.6,'sawtooth',.18,.15);nz(.6,'lowpass',700,90,.4)}else{tone(440,440,.1,'square',.1);tone(660,660,.16,'square',.1,.1)}}
 function spark(n,c){for(let k=0;k<n;k++){const a=Math.random()*6.28,s=40+Math.random()*90;PT.push({x:VW/2,y:VH/2,vx:Math.cos(a)*s,vy:Math.sin(a)*s-20,g:200,l:.2+Math.random()*.2,c:c||'#fd6'})}}
-function shotFx(w){shk=Math.max(shk,[0,.6,2.4,.8,2.2,.3,3.6][w]);
+function shotFx(w){shk=Math.max(shk,[0,.6,2.4,.8,2.2,.3,3.6,3,1.4,.3,1.8,.6,3.2][w]);
+ if(w==7||w==8){TR.push({l:.1,m:.1,c:w==7?'#fff':'#ffd',w:w==7?2:1.5,ox:3,tx:0,ty:0});spark(w==7?8:5)}
+ if(w==9)for(let k=0;k<5;k++)PT.push({x:VW/2+(Math.random()-.5)*10,y:VH-50,vx:(Math.random()-.5)*50,vy:-(120+Math.random()*120),g:-10,l:.25+Math.random()*.15,c:Math.random()<.5?'#f80':'#fd3',s:3+Math.random()*3});
+ if(w==11){TR.push({l:.12,m:.12,c:'#6cf',w:2,ox:2,tx:(Math.random()-.5)*10,ty:(Math.random()-.5)*10});TR.push({l:.12,m:.12,c:'#fff',w:1,ox:2,tx:(Math.random()-.5)*10,ty:(Math.random()-.5)*10});spark(6,'#6cf')}
+ if(w==12){TR.push({l:.3,m:.3,c:'#4ef',w:4,ox:0,tx:0,ty:0});TR.push({l:.3,m:.3,c:'#fff',w:1.5,ox:0,tx:0,ty:0});spark(10,'#8ef')}
  if(w==1||w==3){TR.push({l:.07,m:.07,c:'#ffd',w:1.5,ox:3,tx:(Math.random()-.5)*4,ty:(Math.random()-.5)*4});spark(5)}
  if(w==2){for(let k=0;k<8;k++)TR.push({l:.09,m:.09,c:'#fc8',w:1,ox:(k-4)*2,tx:(Math.random()-.5)*70,ty:(Math.random()-.5)*40});spark(10)}}
 function play(k){if(k==0){hm=.15;spark(6,'#c22')}
@@ -236,7 +294,7 @@ async function invite(){
  const pc=new RTCPeerConnection(cfg),c=pc.createDataChannel('g');pend={pc,slot};
  c.onopen=()=>{players[slot].on=true;chs[slot]=c;c.send(JSON.stringify({t:'hi',id:slot}));ul()};
  c.onmessage=e=>{const m=JSON.parse(e.data),p=players[slot];
-  if(p.al&&m.c===p.rc&&can(m.x,m.y,.2)){p.x=m.x;p.y=m.y}p.a=m.a;p.f=m.f;p.w=m.w;p.nm=String(m.n||"").slice(0,10)};
+  if(p.al&&m.c===p.rc&&can(m.x,m.y,.2)){p.x=m.x;p.y=m.y}p.a=m.a;p.f=m.f;p.w=m.w;p.lo=(m.l|1)&8191;p.nm=String(m.n||"").slice(0,10)};
  c.onclose=()=>{players[slot].on=false;chs[slot]=null;ul()};
  await pc.setLocalDescription(await pc.createOffer());await waitIce(pc);$('oc').value=enc(pc.localDescription);
 }
@@ -245,8 +303,8 @@ async function join(){
  try{
   const pc=new RTCPeerConnection(cfg);
   pc.ondatachannel=e=>{ch=e.channel;ch.onmessage=ev=>{const m=JSON.parse(ev.data);
-   if(m.t=='hi'){id=m.id;me={x:0,y:0,a:0,w:1,f:0,rc:-1};mode=2;$('m').style.display='none';
-    setInterval(()=>{if(ch.readyState=='open')ch.send(JSON.stringify({x:me.x,y:me.y,a:me.a,f:me.f,w:me.w,c:me.rc,n:$('nm').value.slice(0,10)},rnd))},33)}
+   if(m.t=='hi'){id=m.id;me={x:0,y:0,a:0,w:firstW(LO|1),lo:LO|1,f:0,rc:-1};mode=2;$('m').style.display='none';
+    setInterval(()=>{if(ch.readyState=='open')ch.send(JSON.stringify({x:me.x,y:me.y,a:me.a,f:me.f,w:me.w,c:me.rc,l:me.lo,n:$('nm').value.slice(0,10)},rnd))},33)}
    else if(m.t=='s'){S=m;(m.ev||[]).forEach(play)}};ch.onclose=()=>lost=1};
   await pc.setRemoteDescription(dec($('ic').value));await pc.setLocalDescription(await pc.createAnswer());await waitIce(pc);
   $('oc2').value=enc(pc.localDescription);
@@ -265,12 +323,12 @@ function hostConn(c){
  if(slot<0){c.on('open',()=>{c.send(JSON.stringify({t:'full'}));setTimeout(()=>c.close(),300)});return}
  c.on('open',()=>{players[slot].on=true;chs[slot]=c;c.send(JSON.stringify({t:'hi',id:slot}));ul()});
  c.on('data',d=>{const m=JSON.parse(d),p=players[slot];
-  if(p.al&&m.c===p.rc&&can(m.x,m.y,.2)){p.x=m.x;p.y=m.y}p.a=m.a;p.f=m.f;p.w=m.w;p.nm=String(m.n||"").slice(0,10)});
+  if(p.al&&m.c===p.rc&&can(m.x,m.y,.2)){p.x=m.x;p.y=m.y}p.a=m.a;p.f=m.f;p.w=m.w;p.lo=(m.l|1)&8191;p.nm=String(m.n||"").slice(0,10)});
  c.on('close',()=>{players[slot].on=false;chs[slot]=null;ul()});
 }
 function onNet(m){
- if(m.t=='hi'&&!mode){id=m.id;me={x:0,y:0,a:0,w:1,f:0,rc:-1};mode=2;$('m').style.display='none';
-  setInterval(()=>{if(ch.open)ch.send(JSON.stringify({x:me.x,y:me.y,a:me.a,f:me.f,w:me.w,c:me.rc,n:$('nm').value.slice(0,10)},rnd))},33)}
+ if(m.t=='hi'&&!mode){id=m.id;me={x:0,y:0,a:0,w:firstW(LO|1),lo:LO|1,f:0,rc:-1};mode=2;$('m').style.display='none';
+  setInterval(()=>{if(ch.open)ch.send(JSON.stringify({x:me.x,y:me.y,a:me.a,f:me.f,w:me.w,c:me.rc,l:me.lo,n:$('nm').value.slice(0,10)},rnd))},33)}
  else if(m.t=='s'){S=m;(m.ev||[]).forEach(play)}else if(m.t=='full')$('js2').textContent='Spiel ist voll';
 }
 function joinCode(tries){
@@ -291,22 +349,28 @@ function joinCode(tries){
    else st.textContent='Raum '+code+' nicht gefunden. Der Host muss zuerst auf "Host / Solo" geklickt haben und seinen Code sehen. Code und Internet bei beiden prüfen.'}
   else st.textContent='Fehler: '+e.type+' '+(e.message||'')});
 }
-function startGame(){loadMap(+$('mp').value);const D=+$('df').value;dif=[.7,1,1.5][D];dmg=[.6,1,1.4][D];dm=+$('gm').value;if(dm)dmg=1;players[0].nm=$('nm').value.slice(0,10);mode=1;$('m').style.display='none';cv.requestPointerLock()}
+function startGame(){loadMap(+$('mp').value);const D=+$('df').value;dif=[.7,1,1.5][D];dmg=[.6,1,1.4][D];dm=+$('gm').value;if(dm)dmg=1;players[0].nm=$('nm').value.slice(0,10);players[0].lo=LO|1;players[0].w=firstW(LO|1);mode=1;$('m').style.display='none';cv.requestPointerLock()}
 // ---------- Eingabe ----------
 $('mf').onchange=e=>{const f=e.target.files[0];if(!f)return;BG.src=URL.createObjectURL(f);BG.play().catch(()=>{})};
 $('mv').oninput=e=>{BG.volume=e.target.value/100};
+let LO=(()=>{try{return +localStorage.hfLo||63}catch(e){return 63}})()|1;
+function lsu(){$('lc').textContent='('+(owned(LO).length-1)+'/5)';$('ls').textContent='Loadout: Faust'+owned(LO).slice(1).map(i=>' \u00b7 '+SN[i]).join('')}
+(function(){const g=$('lg');for(let i=1;i<WP.length;i++){const l=document.createElement('label'),c=document.createElement('input'),b=document.createElement('b'),d=document.createElement('i');c.type='checkbox';c.checked=!!(LO>>i&1);l.className=c.checked?'on':'';
+ c.onchange=()=>{if(c.checked&&owned(LO).length>5){c.checked=false;return}LO=c.checked?LO|1<<i:LO&~(1<<i);l.className=c.checked?'on':'';lsu();try{localStorage.hfLo=LO}catch(e){}};
+ b.textContent=WP[i].nm;d.textContent=DS[i];l.append(c,b,d);g.appendChild(l)}lsu()})();
+function tab(n){for(let i=0;i<3;i++){$('t'+i).style.display=i==n?'block':'none';$('tb'+i).className='tab'+(i==n?' on':'')}}
 const ky={};
-addEventListener('keydown',e=>{ky[e.code]=1;if(/^Digit[1-7]$/.test(e.code)&&mode)me.w=+e.code[5]-1;if(e.code.startsWith('Arrow')||e.code=='Space')e.preventDefault()});
+addEventListener('keydown',e=>{ky[e.code]=1;if(/^Digit[1-9]$/.test(e.code)&&mode){const L=owned(me.lo||63),k=+e.code[5]-1;if(L[k]!==undefined)me.w=L[k]}if(e.code.startsWith('Arrow')||e.code=='Space')e.preventDefault()});
 addEventListener('keyup',e=>ky[e.code]=0);
 addEventListener('keydown',e=>{if(e.code=='KeyM')showMap^=1;if(e.code=='KeyN'){muted^=1;BG.muted=!!muted}if(e.code=='KeyP'&&mode==1)paused^=1});
 addEventListener('mousemove',e=>{if(document.pointerLockElement===cv)me.a+=e.movementX*.0025});
 addEventListener('mousedown',e=>{if(!mode)return;if(document.pointerLockElement===cv)me.f=1;else cv.requestPointerLock()});
 addEventListener('mouseup',()=>{me.f=0});
-addEventListener('wheel',e=>{if(mode)me.w=(me.w+(e.deltaY>0?1:6))%7});
+addEventListener('wheel',e=>{if(mode){const L=owned(me.lo||63),k=Math.max(0,L.indexOf(me.w));me.w=L[(k+(e.deltaY>0?1:L.length-1))%L.length]}});
 // ---------- Lokaler Spieler ----------
 function local(){
  const P=S.p[id];if(!P)return;
- if(mode==2&&P.rc!==me.rc){me.rc=P.rc;me.x=P.x;me.y=P.y;me.w=1}
+ if(mode==2&&P.rc!==me.rc){me.rc=P.rc;me.x=P.x;me.y=P.y;me.w=firstW(me.lo)}
  if(P.hp<lastHp){hurtFl=.3;hurtSnd();shk=Math.max(shk,2.5)}lastHp=P.hp;
  hm-=dt;shk=Math.max(0,shk-dt*14);fl-=dt;rec=Math.max(0,rec-dt*6);hurtFl-=dt;lc-=dt;if(S.wv!==lastWv){lastWv=S.wv;if(S.wv>0){bn=3.5;jingle(S.wv%5==0)}}bn-=dt;
  if(!P.al)return;
@@ -368,7 +432,7 @@ const ST={0:{s:.8,w:.8,z:0,f:hum('#a52','#c73','#531','#742',0,'#ff0')},1:{s:1,w
  9:{s:.45,w:1,z:.3,f:u=>{const d=u-.5;if(Math.abs(d)>.5)return[];const h=Math.sqrt(.25-d*d),r=[[.5-h,.5+h,'#ddd']];if((u>.3&&u<.42)||(u>.58&&u<.7))r.push([.38,.52,'#400']);if(u>.4&&u<.6)r.push([.7,.8,'#999']);return r}},
  10:{s:1.5,w:.9,z:0,f:hum('#722','#a33','#311','#511',1,'#fe0')},
  11:{s:.3,w:1.2,z:0,f:u=>u<.1||u>.9?[]:[[0,1,'#36d'],[.3,.7,'#8cf']]},
- 12:{s:.7,w:1,z:.4,f:circ('#6f6',.5,.5)}};
+ 12:{s:.7,w:1,z:.4,f:circ('#6f6',.5,.5)},18:{s:.3,w:1,z:.35,f:circ('#7a5',.5,.5)}};
 const ST2={};for(const t in{13:1,14:1,15:1,16:1,17:1})ST[t]={s:SPR_S_(t),w:.4,z:0,f:()=>[],img:1};
 function SPR_S_(t){return {13:.88,14:.8,15:.84,16:.86,17:.84}[t]}
 const IMG={};
@@ -426,7 +490,7 @@ function hud(){
  const P=S.p[id],w=WP[me.w],gx=VW/2;
  x.fillStyle=vg;x.fillRect(0,0,VW,VH);if(fl>0){x.fillStyle='rgba(255,190,80,.1)';x.fillRect(0,0,VW,VH)}mini();
  for(let i=TR.length-1;i>=0;i--){const q=TR[i];q.l-=dt;if(q.l<=0){TR.splice(i,1);continue}x.globalAlpha=q.l/q.m;x.strokeStyle=q.c;x.lineWidth=q.w;x.beginPath();x.moveTo(gx+Math.sin(bob)*5+q.ox,VH-40);x.lineTo(gx+q.tx,VH/2+q.ty);x.stroke()}x.globalAlpha=1;
- for(let i=PT.length-1;i>=0;i--){const q=PT[i];q.l-=dt;if(q.l<=0){PT.splice(i,1);continue}q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=q.g*dt;x.fillStyle=q.c;x.fillRect(q.x,q.y,2,2)}
+ for(let i=PT.length-1;i>=0;i--){const q=PT[i];q.l-=dt;if(q.l<=0){PT.splice(i,1);continue}q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=q.g*dt;x.fillStyle=q.c;x.fillRect(q.x,q.y,q.s||2,q.s||2)}
  // Waffe (Pixel-Art)
  {const U=3,SL='#3a3a44',SK='#c98',bx=gx+Math.sin(bob)*5,by=VH+rec*8+Math.abs(Math.cos(bob))*3,
  W=[[[-3,16,7,18,SL],[-4,23,9,9,SK],[-4,17,9,1,'#a76'],[-3,23,1,5,'#a76'],[0,23,1,5,'#a76'],[3,23,1,5,'#a76']],
@@ -435,14 +499,21 @@ function hud(){
  [[-4,8,8,8,SL],[-4,14,8,6,SK],[-3,32,6,20,'#667'],[-1,50,2,10,'#445'],[2,28,3,9,'#333'],[-3,32,6,2,'#99a'],[-2,28,1,10,'#556']],
  [[-4,14,8,6,SK],[-5,30,10,24,'#585'],[-6,32,12,3,'#363'],[-3,36,6,6,'#d44'],[-5,22,2,6,'#343']],
  [[-4,14,8,6,SK],[-4,30,8,20,'#2cc'],[-2,36,4,16,'#8ff'],[-5,24,10,4,'#146'],[-3,50,6,2,'#6ee']],
- [[-4,14,8,6,SK],[-7,34,14,30,'#3a3'],[-5,42,10,18,'#7f7'],[-8,28,16,5,'#151'],[-3,46,6,6,'#efe']]],TP=[32,38,36,50,42,50,48];
+ [[-4,14,8,6,SK],[-7,34,14,30,'#3a3'],[-5,42,10,18,'#7f7'],[-8,28,16,5,'#151'],[-3,46,6,6,'#efe']],
+ [[-4,14,8,6,SK],[-3,30,6,18,'#556'],[-1,58,2,30,'#334'],[-3,42,6,5,'#223'],[-2,41,4,3,'#6bf']],
+ [[-3,8,6,8,SL],[-3,14,6,6,SK],[-1.5,36,3,14,'#999'],[-3,26,6,7,'#654'],[-1,28,2,2,'#eee'],[-2,22,4,4,'#432']],
+ [[-4,14,8,6,SK],[-4,26,8,14,'#a42'],[-2,38,4,12,'#555'],[-3,40,6,2,'#f80'],[4,22,4,10,'#c33']],
+ [[-4,14,8,6,SK],[-5,28,10,16,'#664'],[-6,32,12,5,'#443'],[-3,34,6,4,'#222'],[-4,22,8,3,'#8a5']],
+ [[-3,8,6,8,SL],[-3,14,6,6,SK],[-2,28,4,14,'#36a'],[-3,32,6,3,'#8cf'],[-1,36,2,6,'#fff'],[-3,24,1,6,'#6ef']],
+ [[-4,14,8,6,SK],[-4,34,8,22,'#445'],[-2,56,4,22,'#8ef'],[-5,28,10,3,'#3cf'],[-1,50,2,16,'#fff']]],TP=[32,38,36,50,42,50,48,58,36,50,36,42,58];
  for(const r of W[me.w])x.fillRect(0,0,0,0),(x.fillStyle=r[4],x.fillRect(Math.round(bx+r[0]*U),Math.round(by-r[1]*U),r[2]*U,r[3]*U));
- if(fl>0)star(bx,by-TP[me.w]*U-10,[14,16,28,16,26,16,34][me.w])}
+ if(fl>0)star(bx,by-TP[me.w]*U-10,[14,16,28,16,26,16,34,22,18,12,20,16,26][me.w])}
  if(hm>0){x.strokeStyle='#f33';x.lineWidth=2;x.beginPath();for(const[a,b]of[[-1,-1],[1,-1],[-1,1],[1,1]]){x.moveTo(gx+a*4,VH/2+b*4);x.lineTo(gx+a*10,VH/2+b*10)}x.stroke()}
  x.fillStyle='#fff';x.fillRect(gx-1,VH/2-6,2,4);x.fillRect(gx-1,VH/2+2,2,4);x.fillRect(gx-6,VH/2-1,4,2);x.fillRect(gx+2,VH/2-1,4,2);
  if(hurtFl>0){x.fillStyle='rgba(255,0,0,'+hurtFl+')';x.fillRect(0,0,VW,VH)}
  x.font='bold 12px monospace';x.textAlign='left';x.fillStyle='#fff';
  x.fillText('HP '+(P.hp|0)+(P.ar?'  RÜSTUNG '+(P.ar|0):'')+'   '+w.nm+(w.am?'  Munition '+P.am[me.w]:''),8,VH-8);
+ {x.font='9px monospace';let xx=8;owned(me.lo||63).forEach((w,k)=>{const t=(k+1)+' '+SN[w];x.fillStyle=w==me.w?'#fd4':'#999';x.fillText(t,xx,VH-22);xx+=t.length*5.6+8});x.font='bold 12px monospace';x.fillStyle='#fff'}
  x.fillText(S.dm?'DEATHMATCH':'WELLE '+S.wv+'   Gegner '+S.e.filter(e=>!e.dead).length+(mode==1&&best?'  Rekord '+best:''),8,14);if(hostCode&&mode==1)x.fillText('Raum-Code: '+hostCode,8,28);
  x.textAlign='right';
  S.p.forEach((p,k)=>{if(p.on){x.fillStyle=PC[p.i];x.fillText((p.i==id?'> ':'')+(p.nm||'P'+(p.i+1))+'  '+(p.al?p.hp|0:'tot')+'  '+p.sc,VW-8,14+k*14)}});
@@ -453,7 +524,7 @@ function hud(){
  if(bn>0){x.globalAlpha=Math.min(1,bn);x.fillStyle=S.wv%5==0?'#f44':'#fd4';x.font='bold 28px monospace';x.fillText(S.wv%5==0?'WELLE '+S.wv+' - BOSS!':'WELLE '+S.wv,VW/2,70);x.globalAlpha=1;x.font='bold 16px monospace'}
  if(document.pointerLockElement!==cv){x.fillStyle='#fd4';x.fillText('KLICKEN ZUM STEUERN',VW/2,VH/2-40)}
  if(paused){x.fillStyle='rgba(0,0,0,.5)';x.fillRect(0,0,VW,VH);x.fillStyle='#fff';x.fillText('PAUSE  (P = weiter)',VW/2,VH/2)}
- if(muted){x.font='10px monospace';x.fillStyle='#aaa';x.textAlign='left';x.fillText('Ton aus (N)',8,VH-22);x.textAlign='center';x.font='bold 16px monospace'}
+ if(muted){x.font='10px monospace';x.fillStyle='#aaa';x.textAlign='left';x.fillText('Ton aus (N)',8,VH-34);x.textAlign='center';x.font='bold 16px monospace'}
  if(lost){x.fillStyle='#f55';x.fillText('VERBINDUNG ZUM HOST VERLOREN',VW/2,VH/2)}
 }
 // ---------- Hauptschleife ----------
@@ -471,4 +542,3 @@ function loop(t){
 }
 requestAnimationFrame(loop);
 </script></body></html>
-
